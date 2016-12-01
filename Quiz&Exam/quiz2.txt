@@ -1,0 +1,86 @@
+I wrote at least one right solution for every question(gurantee correct), might has other solutions. 
+Note: Some questions I've already got full points,but I still wrote right answers for them in case I lost 
+the paper version of the quiz.
+
+1. Make insertion sort in O(nlogn) without heaps?
+we could solve it use Balanced BST,
+             Search    Insert     Sum 
+Balanced BST O(logn)    O(logn)   O(n*logn)
+
+
+2. Time complexity (assume a,b are lists of length n)
+1) a.append(1)---- amatized O(1)
+Reason: amatized O(1) means most of time costs O(1), if appending one element within fixed length, 
+		but if appending one element right after a fixed length,python use dynamic array,
+		it will use a new array new_length = original_length * 2,
+		the original elements will be copied to the new array, which will cost O(n).
+
+2) a.extend(b)---- O(n)
+
+3a) a += [1]-------- amatized O(1) : reason same as 1)
+3b) a = a + [1]----- O(n)          : first copy a,costs O(n), after +[1], return the new value to a.
+
+4a) del a[0] ----- O(n)			   : after del first, the rest will move ahead
+4b) del a[-1] ----- amatized O(1)  : reason samea as 1), oppisite direction
+
+5) a[1:] ----- O(n) : seems no operation, but it copys results to memory, costs O(n),same as x = a[1:]
+
+6) a[:0] = [1] -----O(n)   : insert 1 to the front of a, reason same as 3a)
+
+
+3. "stable 3-way partition" quicksort with randomized pivot
+  def qsort(a):
+	if a == []: return []
+	pivot = a[random.randint(0,len(a)-1)]
+	left = [x for x in a if x < pivot]
+	mid = [x for x in a if x == pivot]
+	right = [x for x in a if x > pivot]
+	return qsort(left) + mid + qsort(right)
+	
+4a. find pairs of distinct non-zero numbers such that x+y = 0(no hash)
+1) sort the lists, cost O(nlogn)
+2) use two pointers, i move from left to right, j moves from right to left
+if a[i]+a[j] > 0, then j--
+if a[i]+a[j] < 0, then j++
+if a[i] +a[j] == 0, then add this to return list and move i,j until they meet
+
+4b) this method works for x + 2y = 0?
+Yes, also could use two pointers, but the difference is when x, y meets, 
+should allow them to cross each other. In another words, j from len(a)-1 to 0, i from 0 to len(a)-1
+e.g 
+-2, -1, 0, 1, 2, 3
+after i cross with j, x: a[i] = 2, y: a[j] = -1, x + 2y = 0
+
+
+5. find a value in a BST t, that is closest to a query x
+
+t = [[[],2,[]],4,[[[],5,[]],6,[[],7,[]]]]
+   4            
+  / \
+ 2   6        find(t,4.7) return 5.
+    / \       find(t,4.1) return 4.
+	5  7
+
+def find(t,x,best=None):    # best always record the current closest value
+    if t == []:
+        return best         # best case
+    left,root,right = t     # good way to split the tree
+    if best == None or abs(root-x) < abs(best-x): # compare best with root
+        best = root # at the beginning set root to best
+    if x < root:
+        return find(left,x,best) # only search the left tree
+    return find(right,x,best)    # only search the right tree
+
+
+t = [[[],2,[]],4,[[[],5,[]],6,[[],7,[]]]]
+t = []
+print find(t,4.7)
+ 
+
+ 
+		
+
+		
+
+
+
