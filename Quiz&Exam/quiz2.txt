@@ -1,6 +1,6 @@
 I wrote at least one right solution for every question(gurantee correct), might has other solutions. 
-Note: Some questions I've already got full points,but I still wrote right answers for them in case I lost 
-the paper version of the quiz.
+Note: Some questions I've already got full points,but I still wrote right answers for them, in case I lost 
+the paper version.
 
 1. Make insertion sort in O(nlogn) without heaps?
 we could solve it use Balanced BST,

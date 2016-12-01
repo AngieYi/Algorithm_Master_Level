@@ -1,0 +1,160 @@
+I wrote at least one right solution for every question(gurantee correct), might has other solutions. 
+Note: Some questions I've already got full points,but I still wrote right answers for them, in case I lost 
+the paper version.
+
+1.
+(a) T(n) = T(n-1)+ O(n) 
+O(n^2); bubble/insertion/selection sort, quicksort worst case, quickselect worst case.
+Reason: each costs O(n) * n(possibilities)
+
+(b) T(n) = kT(n/k) + O(n)   k>=2
+O(nlogn); when k >= 2; k-way mergesort
+Reason: each costs O(n) * logn(possibilities)
+
+(c) T(n) = 2T(n/2) + O(logn)
+O(n); heapify
+
+(d) T(n) = T(n-1) + O(logn)
+O(nlogn); build a heap by n pushes; or n pops from heap.
+Note: "heapsort" receives full marks, but technically, heapsort is heapify + n pops.
+
+2. we could do bubble-down use binary search to find right position to place the current number.
+A path is at most O(logn) long, binary search on it takes O(loglogn)time, so bubble-down could
+run in O(loglogn) time,instead of O(logn), right?
+
+Wrong, 
+reasons:
+(a) the path from root to leaf is non-deterministic.
+(b) still, O(logn) swap time is needed after position is found (see quiz1)
+
+
+3.
+(a) [4,2,3,1] run heapify
+    1<=>2;1<=>4;2<=>4
+	heapify: is bubble-down
+	
+(b) [2,3,6,4,5] run pop-min
+    5=>2;5<=>3;5<=>4
+	pop-min: after pop the top element, swap the last element to top, then bubble-down.
+
+
+4.Given k pairs of lists A_i and B_i (0 <= i < k), each with n sorted numbers,
+find the n smallest pairs in all k * n^2 pairs, and we say (x,y) < (x', y') if and only if x+y < x'+y'.
+Tie-breaking: lexicographical (i.e., prefer smaller x).
+Hint: This is probably shortest code but not necessarily the fastest.
+
+Solution:
+(a)
+from heapq import *
+def nbest(ABs, k, n):
+    def trypush(i, p, q):
+        A, B = ABs[i]
+        if p<n and q<n and (i,p,q) not in used:
+            heappush(h, (A[p]+B[q], i, p, q, (A[p], B[q])))
+            used.add((i, p, q))
+			
+    h, used = [], set()
+    for i in xrange(k):
+        trypush(i, 0, 0)
+    
+	for _ in xrange(n):
+        _, i, p, q, pair = heappop(h)
+        yield pair
+        trypush(i, p+1, q)
+        trypush(i, p, q+1)
+
+(b) O(klogk + nlog(n+k))
+    Heap length: k (start) => k+n (end)
+
+(c) Heapify instead of k pushes in initialization.
+    O(k + nlog(n+k))
+
+	
+(d.1) if for some i the (i, 0, 0) pair does not make the top n, then none of its decendants (i, p, q) will.
+    Strategy: Quickselect top n among the k (i, 0,0) pairs before heapify.
+	1)quickselect the nth smallest element cost O(k),go through the rest of its elements and compare with
+	nth smallest,if smaller,keep it,cost another O(k), so totally cost O(k).
+	2) n elements heapify cost O(n)
+	3) n pop and 2n push, cost O(nlogn)
+    Heap length: n (start) => 2n (end)
+    O(k + n + nlogn) = O(k + nlogn)
+(d.2) strategy: use max-heap
+      1) use max-heap to save n elements cost O(nlogn), 
+      the rest k-n compare with the max value,if smaller than it, push into it, costs O(k*logn)
+	  2,3) same as (d.1)
+	  O(nlogn + k*logn + n + nlogn) = O(k+nlogn)
+	
+
+5. 
+def fib_naive(n):   # time:O(a^n)
+  if n==1 or n==2:
+    return 1
+  return fib_naive(n-1) + fib_naive(n-2)
+
+def fib_memo1(n, cache = None):# DP, time: O(n); space: O(n)
+  if cache is None:
+    cache = {}
+  if n in cache:
+    return cache[n]
+  if n <= 2:
+    cache[n] = 1
+  else:
+    fib_memo1(n-1, cache) + fib_memo1(n-2, cache)
+  return cache[n]
+
+def fib_memo2(n, cache={0:1, 1:1}): # DP,time: O(n); space: O(n)
+    if n in cache:
+        return cache[n]
+    cache[n] = fib_memo2(n-1, cache) + fib_memo2(n-2, cache)
+    return cache[n]
+
+
+def fib_best(n): # DP,time: O(n); space: O(1)
+    a, b = 1, 1
+    for _ in xrange(n):
+        a, b = b, a+b
+    return b
+
+6. A Country has n types of coins, each coins with value v_i, make up X cents with these coins.
+   
+1) Minimize the total number of coins. Assume v_0 =1 to make it always possible.
+E.g: X=5, v = [1,3],opt = 3 (5=1+1+3). 
+
+(a) Give greedy counter example
+[1,3,4]; greedy 6=4+1+1(3 coins) optimal 6=3+3(2 coins)
+
+(b) define the DP subproblem
+dp(x): smallest number of coins needed to make up X cents.
+
+(c) Recurrence relation and base case
+Base case:   opt(0) = 0
+Recurrence:  opt(x) = min(opt(x-v_i) + 1)     if x >= v_i, for i in 0...n-1
+Goal:        opt(X)
+
+(d) 
+space: O(X)
+time: O(Xn)
+
+Note: similar to unbounded knapsack
+
+2) Minimize the total types of coins,Assume v_0>1, otherwise any solution is trivial.
+E.g. X=6, v=[2,4], opt=1 (6=2+2+2 1 type) instead of 2 (6=2+4 2 types)
+ 
+(e) define the DP subproblem
+opt(x, i): smallest types of coins needed to make up X cents 
+           using a subset of only the first i types of coins.
+
+(f) Recurrence relation and base case
+Base case:  opt(0, i) = 0 for any i
+		    opt(x, 0) = +INF (x>0)
+
+Recurrence: opt(x, i) = min(opt(x - j * v_i, i-1) + 1) 
+			if x-j*v_i>=0, for i in 0...n-1 and for j in 0..x//v_i
+
+Goal:       opt(X, n)
+
+(g) space: O(Xn)
+    time:  crude analysis: the worst case is O(X^2 n)
+    	   detailed analysis: O(X^2 \sum_{i=0..n-1} 1/v_i)
+
+Note: similar to bounded knapscak, except time complexity.
