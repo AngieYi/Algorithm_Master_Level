@@ -1,5 +1,5 @@
 # Algorithm_Python_MSLevel
 hands on code in master level algorithm course
-* own implmentation
+* Own implmentation
 
 * Solutions of prof. and TA
