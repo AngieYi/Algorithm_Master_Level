@@ -86,7 +86,7 @@ def nbest(ABs, k, n):
 	
 
 5. 
-def fib_naive(n):   			# time:O(a^n)
+def fib_naive(n):   			# time:O(a^n)  1<a<2
   if n==1 or n==2:
     return 1
   return fib_naive(n-1) + fib_naive(n-2)
