@@ -1,0 +1,141 @@
+HW6 - DP (part 2)
+1. Unbounded Knapsack
+   You have n items, each with weight w_i and value v_i, and has infinite copies.
+   **All numbers are positive integers.**
+   What's the best value for a bag of W?
+   >>> best(3, [(2, 4), (3, 5)])
+   (5, [0, 1])
+   the input to the best() function is W and a list of pairs (w_i, v_i).
+   this output means to take 0 copies of item 1 and 1 copy of item 2.
+
+   tie-breaking: *reverse* lexicographical: i.e., [1, 0] is better than [0, 1]:
+   (i.e., take as much from item 1 as possible, etc.)
+
+   >>> best(3, [(1, 5), (1, 5)])
+   (15, [3, 0])
+   >>> best(3, [(1, 2), (1, 5)])
+   (15, [0, 3])
+   >>> best(3, [(1, 2), (2, 5)])
+   (7, [1, 1])
+   >>> best(58, [(5, 9), (9, 18), (6, 12)])
+   (114, [2, 4, 2])
+   >>> best(92, [(8, 9), (9, 10), (10, 12), (5, 6)])
+   (109, [1, 1, 7, 1])
+
+   Q: What are the time and space complexities?
+   filename: knapsack_unbounded.py
+---------------------------------------------------------------------------------------------------------------------- 
+Q: What are the time and space complexities? 
+For space complexity, the two dimension array costs nw, and for each item, 
+I loop from 0-n amount and save each case to one array, so the array size depends on the weight, 
+so the total amount of space would be O(nw+¡ÆW/Wi)
+
+For time complexity: since for each w, in order to get the max value, 
+we need to use a new list to save for every possible within w/wi, then max them, 
+so total time complexity would be W * (W/Wn + W/Wn-1 + W/Wn-2 + ... W/W2 + W/W1), which is O(w *¡ÆW/Wi)
+
+(a) Describe an exhaustive solution, and analyze complexity (might be exponential).
+Exhaustive solution, 
+For space complexity, within total weight W, I would choose to nested loop each item with W/Wn possibility, so there might be W/Wn * W/Wn-1 * W/Wn-2 * ... W/W2 * W/W1 possibilities. And then compare possibilities to get the max value of option, so Space complexity would be W/Wn * W/Wn-1 * W/Wn-2 * ... W/W2 * W/W1
+For time complexity, since we would try every item, each item either choose or not choose, so time complexity would be 2 ^ (maxW/Wi)
+
+(b) Describe a greedy solution, and analyze complexity.
+greedy is always choosing the bigger value items as many as possible, if there is space left, consider the smaller value items. O(W*max(w/wi))
+
+(c) Show a counterexample to the greedy solution.
+best(7, [(2, 5), (3, 8)])   # greedy not useful since [2,1] is better than [0,2]
+if use greedy, then will choose the second item as many as possible, since its value is bigger. But if do like this way, value = 2*8 = 16, however if use DP, value = 2*5+1*8 = 18
+
+
+(d) Theoretically, is the top-down solution faster, or the bottom-one one faster?
+Theoretically, top-down would be faster,since bottom-up needs to consider every weight from 0-w, and save them.
+however some weight do not need to consider,it's not used for the larger weight.
+But top-down only consider some weight that is possible happens and save,based on the item it chooses.
+
+(e) Empirically, which one is faster? (Try some long random lists) 
+Empirically, I think bottom-up is faster, although this assignment I only implement top-down. 
+But my top-down solution is similar to prof.'s mis.py,I empirically run and compare prof.'s top-down 
+and bottom-up versions of mis.py, then I know that bottom-up is faster. 
+I guess because the top-down we use recursive version, and bottom-up version did not use recursive,
+recursive version needs stack to memorize so that it could be recursively called, 
+it costs more time than bottom-up.
+
+--------------------------------------------------------------------------------------------------------------------
+
+2. [WILL BE GRADED] 
+   Bounded Knapsack
+   You have n items, each with weight w_i and value v_i, and has c_i copies.
+   **All numbers are positive integers.**
+   What's the best value for a bag of W?
+   >>> best(3, [(2, 4, 2), (3, 5, 3)])
+   (5, [0, 1])
+   the input to the best() function is W and a list of triples (w_i, v_i, c_i).
+   tie-breaking: same as in p1:
+   >>> best(3, [(1, 5, 2), (1, 5, 3)])
+   (15, [2, 1])
+   >>> best(3, [(1, 5, 1), (1, 5, 3)])
+   (15, [1, 2])
+   >>> best(20, [(1, 10, 6), (3, 15, 4), (2, 10, 3)])
+   (130, [6, 4, 1])
+   >>> best(92, [(1, 6, 6), (6, 15, 7), (8, 9, 8), (2, 4, 7), (2, 20, 2)])
+   (236, [6, 7, 3, 7, 2])
+   Q: What are the time and space complexities?
+   filename: knapsack_bounded.py
+
+----------------------------------------------------------------------------------------------------------------------
+Q: What are the time and space complexities? 
+For space complexity, the two dimension array costs nw, and for each item, I loop from 0-n amount and save each case to one array, so the array size depends on Ci, so the total amount of space would be O(nw+¡ÆCi)
+
+For time complexity: since for each w, in order to get the max value, we need to use a new list to save for every possible within Ci, then max them, so total time complexity would be w * (Cn+Cn-1+Cn-2+...+C1), which is O(w *¡ÆCi)
+
+(a) Describe an exhaustive solution, and analyze complexity (might be exponential).
+Exhaustive solution, 
+For space complexity, within total weight W, I would choose to nested loop each item with Ci possibility, so there might be Cn * Cn-1 * Cn-2 *...C2 * C1 possibilities. And then compare possibilities to get the max value of option, so Space complexity would be Cn * Cn-1 * Cn-2 *...C2 * C1
+For time complexity, since we would try every item, each item either choose or not choose, so time complexity would be 2 ^ (¡ÆCi)
+
+(b) Describe a greedy solution, and analyze complexity.
+greedy is always choosing the bigger value items as many as possible, if there is space left, consider the smaller value items. O(W*max(w/wi))
+
+(c) Show a counterexample to the greedy solution.
+best(7, [(2, 5, 2), (3, 8, 2)])   # greedy not useful since [2,1] is better than [0,2]
+if use greedy, then will choose the second item as many as possible, since its value is bigger. But if do like this way, value = 2*8 = 16, however if use DP, value = 2*5+1*8 = 18
+
+
+(d) Theoretically, is the top-down solution faster, or the bottom-one one faster?
+Theoretically,top-down would be faster,since bottom-up needs to consider every weight from 0-w, and save them.
+however some weight do not need to consider,it's not used for the larger weight.
+But top-down only consider some weight that is possible happens and save,based on the item it chooses.
+
+(e) Empirically, which one is faster? (Try some long random lists)
+Empirically, I think bottom-up is faster, although this assignment I only implement top-down. 
+But my top-down solution is similar to prof.'s mis.py,I empirically run and compare prof.'s top-down 
+and bottom-up versions of mis.py, then I know that bottom-up is faster. 
+I guess because the top-down we use recursive version, and bottom-up version did not use recursive,
+recursive version needs stack to memorize so that it could be recursively called, 
+it costs more time than bottom-up.
+----------------------------------------------------------------------------------------------------------------------
+
+Debriefing (required!): --------------------------
+
+0. What's your name?
+Hongyan Yi
+
+1. Approximately how many hours did you spend on this assignment?
+12 hour
+
+2. Would you rate it as easy, moderate, or difficult?
+moderate
+
+3. Did you work on it mostly alone, or mostly with other people?
+Alone
+
+4. How deeply do you feel you understand the material it covers (0%¨C100%)? 
+80%, the time and space complexity I'm not sure whether correct.
+
+5. Which part(s) of the course you like the most so far?
+Any DP classes
+
+6. Which part(s) of the course you dislike the most so far?
+TA explains the quiz2 solution in class. 
+Go through the answer too fast, sometimes even could not catch the exact right answers, 
+not to mention understanding each question.

@@ -1,0 +1,176 @@
+CS 519-005, Algorithms (MS/MEng-level), Fall 2016
+HW4 - Heaps
+
+Due electronically on Canvas on Sunday Oct 16, 11:59pm.
+No late submission will be accepted.
+
+Include in your submission: report.txt, nbest.py, kmergesort.py, datastream.py.
+DO _NOT_ ZIP YOUR SUBMISSION.
+datastream.py will be graded for correctness (1%).
+
+Textbooks for References:
+[1] CLRS Ch. 6
+[2] Python heapq module -- https://docs.python.org/2/library/heapq.html
+
+0. There are two methods for building a heap from an unsorted array:
+   (1) insert each element into the heap  --- O(nlogn)
+   (2) heapify (top-down)             --- O(n)
+
+   (a) (theoretically) Derive their time complexities.
+   (b) (empirically)   Use a long list of random numbers to show the difference in time.
+       		       What about sorted or reversely-sorted numbers?
+
+   Write your answers to (a) and (b) in report.txt.
+
+(a)
+1) when inserting each element into the heap, the majority leaf nodes (n/2 nodes), each cost logn to bubble up, so the time complexity is O(nlogn) 
+
+2) when doing heapify, all the leaf nodes are already heap, do not need to do any bubble down, the 2nd level (n/4 nodes) at most do one swap, the 3rd level at most do two swaps, so on and forth, the top level which has n/2h nodes, at worst do logn swaps, so the time complexity is:
+
+n/4 * 1 + n/8 * 2 + n/16 * 3 + ... + n/2h * logn
+= n (1/4 + 2/8 + ... + 3/16 + ... + logn/2h)
+= O(n)
+
+
+b)
+--- range(0,102400,1) sorted ---
+heappush 0.0350000858307
+heapify  0.0429999828339
+
+--- range(102400,0,-1) reversely-sorted ---
+heappush 0.329999923706
+heapify  0.0340001583099
+
+
+1. (taken from my first paper: see "Algorithm 1" in Huang and Chiang (2005).)
+
+   Given two lists A and B, each with n integers, return
+a sorted list C that contains the smallest n elements from AxB:
+
+     AxB = { (x, y) | x in A, y in B }
+
+   i.e., AxB is the Cartesian Product of A and B.
+
+   ordering:  (x,y) < (x',y')  iff. x+y < x'+y' or (x+y==x'+y' and y<y')
+
+   You need to implement three algorithms and compare:
+
+   (a) enumerate all n^2 pairs, sort, and take top n.
+enumerate the pairs cost (n^2), sort cost (n^2 logn^2), take top n cost (n), so the final result is
+(n^2)+ (n^2 logn^2)+ (n) = O(n^2 logn)
+
+   (b) enumerate all n^2 pairs, but use qselect from hw1.
+
+enumerate the pairs cost (n^2), use qselect cost (n^2), to sum up O(n^2)
+
+   (c) Dijkstra-style best-first, only enumerate O(n) (at most 2n) pairs.
+first sort these two lists, then use heapq, choose a0b0 as the basic element, then push two pair of elements into the heap, a0b1 and a1b0, and then pop, each time pop one smallest until get n.
+so each time pop cost (logn), 2 push cost (2logn), then n times
+n*(logn + 2logn) = O(nlogn)
+ 
+   Hint: you can use Python's heapq module for priority queue.
+
+
+Q: What are the time complexities of these algorithms? 
+
+   >>> a, b = [4, 1, 5, 3], [2, 6, 3, 4]
+   >>> nbesta(a, b)   # algorithm (a), slowest
+   [(1, 2), (1, 3), (3, 2), (1, 4)]
+
+   >>> nbestb(a, b)   # algorithm (b), slow
+   [(1, 2), (1, 3), (3, 2), (1, 4)]
+
+   >>> nbestc(a, b)   # algorithm (c), fast
+   [(1, 2), (1, 3), (3, 2), (1, 4)]
+
+   Filename: nbest.py
+
+
+
+2. k-way mergesort (the classical mergesort is a special case where k=2).
+   >>> kmergesort([4,1,5,2,6,3,7,0], 3) 
+   [0,1,2,3,4,5,6,7]
+   Q: What is the complexity? Write down the detailed analysis in report.txt.
+Filename: kmergesort.py
+
+The key difference between the naive algorithm and using min-heap is how to get the smallest element from the k smallest elements.
+when doing analysis, from the first round to the last round, we suppose each round each section has already sorted.
+For the first round
+1) create the heap of k smallest elements. cost O(k)
+2) heap pop the smallest element cost O(logk), push its successor into the heap cost O(logk), since each time get only one element, it should do n times to n elements, so this round the total time complexity is O(k+logk *n)
+
+For the second round
+There are k sections, each section there are n/k elements. For each section, time complexity is 
+(k+logk * n/k), so the total second round will cost O(k^2+nlogk)
+
+O(k^3 + nlogk)----- 3rd round
+O(k^4 + nlogk)----- 4th round
+O(klogkn + nlogk) --- last round
+
+The depth is logkn
+
+All these add together would be O(n) + O(nlogn) = O(nlogn)
+
+
+
+
+3. [WILL BE GRADED]
+   
+   Find the k smallest numbers in a data stream of length n (k<<n),
+   using only O(k) space (the stream itself might be too big to fit in memory).
+
+   >>> ksmallest(4, [10, 2, 9, 3, 7, 8, 11, 5, 7])
+   [2, 3, 5, 7]
+   >>> ksmallest(3, xrange(1000000, 0, -1))
+   [1, 2, 3]
+
+   Note: 
+   a) it should work with both lists and lazy lists
+   b) the output list should be sorted
+
+   Q: What is your complexity? Write down the detailed analysis in report.txt.
+   
+   Filename: datastream.py
+
+Suppose each time the new element that wants to insert is x
+
+1) naive way
+1.1) find place to insert (use binary search)cost O(logk)
+1.2) move elements, worst case if insert first, and need to move all the rest elements. O(k)
+[O(logk)+O(k)] * n = O(kn)
+
+2) use max-heap
+each time only need to compare x with root, if x is bigger than root, directly discard it; if x is smaller than root, insert x into heap, worst case costs O(nlogk).
+But at the end, the output list should be sorted, so need to pop the heap, which cost O(klogk).
+So the total time complexity is O(nlogk+klogk)
+
+Python by default is min-heap, so use negative min-heap.
+
+
+
+Debriefing (required!): --------------------------
+
+1. Approximately how many hours did you spend on this assignment?
+12+ hours
+2. Would you rate it as easy, moderate, or difficult?
+difficult
+
+3. Did you work on it mostly alone, or mostly with other people?
+   Note you are encouraged to discuss with your classmates, 
+   but each students should submit his/her own code.
+   
+alone
+
+4. How deeply do you feel you understand the material it covers (0%¨C100%)? 
+60%
+
+5. Which part(s) of the course you like the most so far?
+all prof. huang's lectures
+
+6. Which part(s) of the course you dislike the most so far?
+any quiz solution discussion lectures without post the solution ahead
+
+This section is intended to help us calibrate the homework assignments. 
+Your answers to this section will *not* affect your grade; however, skipping it
+will certainly do.
+

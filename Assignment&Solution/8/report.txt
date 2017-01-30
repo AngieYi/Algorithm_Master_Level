@@ -1,0 +1,96 @@
+Include in your submission: report.txt, lis.py, tsp.py.
+----------------------------------------------------------------------------------------------------
+0. (a) Describe a greedy algorithm for LIS and show a counter example.
+I think greedy algorithm in LIS would be two cases:
+case1: always treat the increasing substring start from the first element is right.
+counter example: efgabcd, the greedy answer is efg, but the correct answer is abcd.
+
+case2: always treat the increasing substring ends at the last element is right.
+counter example: defgabc, the greedy answer is abc, but the correct answer is defg
+
+   (b) Describe an exhaustive algorithm for TSP and analyze complexity.
+The exhaustive algorithm would be check all the possible combination of the city, which ends at the start city.
+Both Space and time complexity would be O(n!)
+----------------------------------------------------------------------------------------------------------
+
+1. [WILL BE GRADED]
+   Longest (Strictly) Increasing Subsequence
+   input/output are lower-case strings:
+   >>> lis("aebbcg")
+   "abcg"
+   >>> lis("zyx")
+   "z"
+   tiebreaking: arbitrary. any optimal solution is ok.
+   filename: lis.py 
+   Q: What are the time and space complexities?
+----------------------------------------------------------------------------------------------------------
+In my code, 
+_lis(j, a, opt), 
+Time complexity O(n^2): each element needs to compare with all its previous elements, start from the last element, I add one biggest elements at the end, need to compare with its previous n elements, then the second at last needs to compare with n-1 elements, so on and force, so the time complexity is n+(n-1)+(n-2)+(n-3)+... = O(n^2);
+Space complexity O(n^2): I use one temp list to record, since each recursive call will use one new list, so space costs O(n^2)  
+
+solution(j, a, opt), 
+Time complexity: I use heappush and heappop to get the right output order, so time complexity costs logn + logn, which is O(logn).
+Space complexity O(n):
+
+To sum up, my whole algorithm:
+Time complexity: O(n^2)
+Space complexity: O(n^2)
+----------------------------------------------------------------------------------------------------------
+2. Traveling Salesman Problem (TSP).
+   Given an undirected graph of n nodes (0..n-1) representing a road network, the traveling salesman has to start from city 0 and visit each city
+   once and only once, and return to city 0. Find the minimum-length tour (cycle)
+   that satisifies these conditions.
+   You can use whatever input/output format.
+Write the subproblem definition, recurrence relation, and space/time complexities in report.txt.
+-------------------------------------------------------------------------------------------------------------------
+Subproblem:
+opt[s,i]: shortest path from 0-i, traversing the cities in s.
+
+recurrence relation:
+opt[s,i]: min(opt[s-{i},j]+cost(j,i)
+       j belong to s-{i}
+
+base case: 
+opt[{0},0] = 0
+
+goal:
+min opt[v,i]+cost(i,0)
+
+space complexity
+O(2^n * n)
+
+time complexity
+O(2^n * n^2)
+----------------------------------------------------------------------------------------------------------
+
+Debriefing (required!): --------------------------
+
+0. What's your name?
+Hongyan Yi
+
+1. Approximately how many hours did you spend on this assignment?
+14 hours
+
+2. Would you rate it as easy, moderate, or difficult?
+travel sales man is difficult, longest increasing set is moderate
+
+3. Did you work on it mostly alone, or mostly with other people?
+alone
+
+4. How deeply do you feel you understand the material it covers (0%¨C100%)? 
+65%
+
+5. Which part(s) of the course you like the most so far?
+compare max independent set, 0-1 knapsack, bounded/unbounded knapsack. 
+compare the difference and similarity in algorithm level, time-space complexity level, 
+which are pretty helpful for student to digest.
+when solving or explain a new problem, review the related knowledge from previous homework or lecture, 
+then give hints are pretty good.
+
+6. Which part(s) of the course you dislike the most so far?
+All the time and space complexity analysis part of DP algorithms, 
+normally the explanation of algorithm is fine, but time and space complexity part explained too fast 
+with less details or too briefly, sometimes directly give the result without details, 
+most of time I could not understand the reason.
+ 

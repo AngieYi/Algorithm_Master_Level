@@ -1,0 +1,160 @@
+Include in your submission: report.txt, rna.py.
+
+***Please analyze time/space complexities for each problem in report.txt.
+   [UPDATE] Also explain the algorithm of each question you solved.
+
+1. Given an RNA sequence, such as ACAGU, we can predict its secondary structure 
+   by tagging each nucleotide as (, ., or ). Each matching pair of () must be 
+   AU, GC, or GU (or their mirror symmetries: UA, GC, UG). 
+   We also assume pairs can _not_ cross each other. 
+   The following are valid structures for ACAGU:
+
+   ACAGU
+   .....
+   ...()
+   ..(.)
+   .(.).
+   (...)
+   ((.))    
+
+   We want to find the structure with the maximum number of matching pairs. 
+   In the above example, the last structure is optimal (2 pairs). 
+
+   >>> best("ACAGU")
+   (2, '((.))')
+
+   [UPDATE] Tie-breaking: arbitrary is fine. Don't worry as long as your structure is one of the correct best structures.
+---------------------------------------------------------------------
+I did not use span length but index,my algorithm get most hints from TA illustration in class.
+I use top-down, recursive method to implement. 
+
+
+opt[(i,j)]: the max num of pairs in a string(index starts from i to j) and the split index,
+            the split index is to help backtrack the solution.
+
+			
+Goal: 
+opt[(0,n-1)], which 0 is the start index, and n-1 is the end index,n is the length of the string
+
+
+Base case:
+if i == j:
+opt[(i,j)] = [(0,-1)]
+
+if i + 1 == j:
+i and j pair: opt[(i,j)] = [(1,-1)]
+i and j not pair: opt[(i,j)] = [(0,-1)]
+
+
+Transition functions:
+opt[(i,j)] = max { 1+opt[(i+1,j-1)],if i and j pairs.
+				   opt(i,k)+opt(k+1,j),if str splits by k
+				 }
+
+				 
+Details about backtrack : 
+I save part of the structure in the process, and use the opt split value to help backtrack.
+
+
+time complexity: O(n^3)
+Space complexity: O(n^3)
+
+--------------------------------------------------------------------------------------------
+2. Total number of all possible structures
+   >>> total("ACAGU")
+   6
+--------------------------------------------------------------------------------------------
+my algorithm did not use span but index,
+I get most hints from Prof.'s solution posted on canvas.
+I use top-down, recursive method to implement. 
+
+Goal: 
+opt[(0,n-1)], which 0 is the start index, and n-1 is the end index,n is the length of the string
+
+
+Base case:
+if i == j:      # one element
+  return 1
+if i == j + 1:  # (between has nothing) after has nothing
+  return 1
+
+  
+Transition functions:
+1) i is unpaired --  opt[(i,j)] += _total(str,i+1,j)
+it means i is unpaired with any elements, assume the first is ".", the _total(str,i,j)
+transfered to _total(str,i+1,j)
+
+2) i is paired with k(i<k<=j) -- opt[(i,j)] += _total(str,i+1,k-1) * _total(str,k+1,j)
+assume the first is "(",check whether there are other ")" to pair with it, if paired,
+   (TOTAL(i+1,k-1)) TOTAL(k+1,j)
+   i              k  
+we need to go through all possible ")" that matchs with first element, if there is none,
+this option will not has any possible option.
+
+
+time complexity: O(n^3)
+Space complexity: O(n^3)
+
+---------------------------------------------------------------------------------------------
+
+3. k-best structures: output the 1-best, 2nd-best, ... kth-best structures.
+
+   >>> kbest("ACAGU", 3)
+   [(2, '((.))'), (1, '(...)'), (1, '.(.).')]
+   
+   The list must be sorted. 
+   [UPDATE] Arbitray tie-breaking is fine.
+   In case the input k is bigger than the number of possible structures, output all.
+   Sanity check: kbest(s, 1)[0][0] == best(s)[0] for each RNA sequence s.
+
+All three functions should be in one file: rna.py.
+---------------------------------------------------------------------------------------------
+my algorithm did not use span but index.
+I get most hints from Dezhong's office hour and HW4 solution.
+
+I implemented this based on problem 2, and borrowed ideas from nbest, kmergesort, ksmallest.
+time complexity: O(n^3 + n^2*klogk)
+Space complexity: O(n^3)
+
+
+I know but did not implement
+1) Naive: O(n^3 * k^2)
+
+2) Algorithm in class: O(n^3 * klogk)
+
+3) Best time complexity: O(n^3 + nklogk)
+n3 is base 
+nlogk for each best
+k best cost : k*nlogk
+ 
+---------------------------------------------------------------------------------------------
+   
+Debriefing (required!): --------------------------
+
+0. What's your name?
+Hongyan Yi
+
+1. Approximately how many hours did you spend on this assignment?
+4 days
+
+2. Would you rate it as easy, moderate, or difficult?
+First two after hints from prof. is moderate, without hints it's difficult.
+The third one is difficult.
+
+3. Did you work on it mostly alone, or mostly with other people?
+Alone, but get hints from TA.
+
+4. How deeply do you feel you understand the material it covers (0%¨C100%)? 
+60%
+
+5. Which part(s) of the course you like the most so far?
+compare max independent set, 0-1 knapsack, bounded/unbounded knapsack. 
+compare the difference and similarity in algorithm level, time-space complexity level, 
+which are pretty helpful for student to digest.
+when solving or explain a new problem, review the related knowledge from previous homework or lecture, 
+then give hints are pretty good.
+
+6. Which part(s) of the course you dislike the most so far?
+All time and space complexity analysis of DP algorithms, explained too fast with less details,
+sometimes directly give the result without details, most of time I could not catch up.
+
